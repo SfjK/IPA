@@ -8,6 +8,7 @@
 	<link type="text/css" rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css "/>
 	<link type="text/css" rel="stylesheet" href="css/sbts.css" />
 	<?php 
+	
 	/**
 	 * Displays the extra header
 	 *

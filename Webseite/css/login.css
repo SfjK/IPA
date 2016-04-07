@@ -49,7 +49,7 @@ body {
   margin-bottom: 							15px;
 }
 input:required:invalid, input:focus:invalid {
-  background-image: 						url(error.png);
+  background-image: 						url(../icon/login_error.png);
   background-position: 						right;
   background-repeat: 						no-repeat;
 }
