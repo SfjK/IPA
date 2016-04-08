@@ -22,15 +22,15 @@ if(!isset($_SESSION['user_id']))
 
 //Abfrage der Nutzer ID vom Login
 $userid = $_SESSION['user_id'];
-$usernachname = $_SESSION['user_nachname'];
-$uservorname = $_SESSION['user_vorname'];
+$userNachname = $_SESSION['user_nachname'];
+$userVorname = $_SESSION['user_vorname'];
 
-if($_SESSION['user_role'] === '1') 
+if($_SESSION['user_role'] == '1') 
 {
 	$navbar = 1;	
 }
 
-if($_SESSION['user_role'] === '2') 
+if($_SESSION['user_role'] == '2') 
 {
 	$navbar = 2;
 }

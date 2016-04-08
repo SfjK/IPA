@@ -47,38 +47,48 @@ if(isset($_POST['log-in']))
 	// Username to lowercase
 	$username = strtolower($username);
 	 
-	/* create a prepared statement */
-	$stmt = mysqli_stmt_init($conn);
-	if (mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer WHERE cUsername=? and cPasswort=?")) 
-	{
-		mysqli_stmt_bind_param($stmt, "ss", $username, $password);
-		mysqli_stmt_execute($stmt);
-		$result = mysqli_stmt_get_result($stmt);
-		
-		if ($result->num_rows > 0)
-		{	
-			mysqli_fetch_array($result, MYSQLI_NUM);
-			foreach ($result as $row)
-			{
-				// Save Session Variables
-				$_SESSION["user_id"] = $row["cBenutzerID"];
-				$_SESSION["user_username"] = $row["cUsername"];
-				$_SESSION["user_nachname"] = $row["cNachname"];
-				$_SESSION["user_vorname"] = $row["cVorname"];
-				$_SESSION["user_role"] = $row["cRolle"];
-				
-				// Redirect to chosen Page
-				header("Location: ".$startPage);
-			}
-		}
-		else
+		/* create a prepared statement */
+		$stmt = mysqli_stmt_init($conn);
+		if (mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer WHERE cUsername=? and cPasswort=?")) 
 		{
-			$loginError = '<div class="alert alert-danger">Falscher Benutzername oder Passwort.</div>';
+			mysqli_stmt_bind_param($stmt, "ss", $username, $password);
+			mysqli_stmt_execute($stmt);
+			mysqli_stmt_store_result($stmt);
+			
+			echo 'DEBUG: Number of rows: '.mysqli_stmt_num_rows($stmt);
+			
+			if (mysqli_stmt_num_rows($stmt) > 0)
+			{
+				mysqli_stmt_bind_param($stmt, "ss", $username, $password);
+				mysqli_stmt_execute($stmt);
+				
+				$result = mysqli_stmt_get_result($stmt);
+				mysqli_fetch_array($result, MYSQLI_NUM);
+				
+				foreach ($result as $row)
+				{
+					// Save Session Variables
+					$_SESSION["user_id"] = $row["cBenutzerID"];
+					$_SESSION["user_username"] = $row["cUsername"];
+					$_SESSION["user_nachname"] = $row["cNachname"];
+					$_SESSION["user_vorname"] = $row["cVorname"];
+					$_SESSION["user_role"] = $row["cRolle"];
+					
+					// Redirect to chosen Page
+					header("Location: ".$startPage);
+				}
+			}
+			else
+			{
+				$loginError = '<div class="alert alert-danger"> Falscher Benutzername oder Passwort.</div>';
+			}
+		
+			mysqli_stmt_free_result($stmt);
+			mysqli_stmt_close($stmt);
 		}
-		mysqli_stmt_free_result($stmt);
-		mysqli_stmt_close($stmt);
 	}
-}
+	
+
 ?>
 <!-- Log-In Html Structure -->
 <div class="container">

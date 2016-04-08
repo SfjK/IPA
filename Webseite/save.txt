@@ -124,3 +124,102 @@
 			mysqli_stmt_close($stmt);
 		}
 	}
+	
+	
+	
+	
+	
+	
+	
+	/** Post-Back for Login */
+if(isset($_POST['log-in']))
+{
+	session_start();
+	$username = $_POST["username"];
+	$password = $_POST["password"];
+	
+	//Startpage
+	$param= "";
+	if(!empty($_POST["id"]))
+	{
+		$param="?id=".$_POST["id"];
+	}
+	$startPage= $_POST["page"].$param;
+	
+	// Passwort to Sha
+	$password = toSha($password);
+	
+	// Username to lowercase
+	$username = strtolower($username);
+	 
+	/* create a prepared statement */
+	$stmt = mysqli_stmt_init($conn);
+	if (mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer WHERE cUsername=? and cPasswort=?")) 
+	{
+		mysqli_stmt_bind_param($stmt, "ss", $username, $password);
+		mysqli_stmt_execute($stmt);
+		$result = mysqli_stmt_get_result($stmt);
+		
+		if ($result->num_rows > 0)
+		{	
+			mysqli_fetch_array($result, MYSQLI_NUM);
+			foreach ($result as $row)
+			{
+				// Save Session Variables
+				$_SESSION["user_id"] = $row["cBenutzerID"];
+				$_SESSION["user_username"] = $row["cUsername"];
+				$_SESSION["user_nachname"] = $row["cNachname"];
+				$_SESSION["user_vorname"] = $row["cVorname"];
+				$_SESSION["user_role"] = $row["cRolle"];
+				
+				// Redirect to chosen Page
+				header("Location: ".$startPage);
+			}
+		}
+		else
+		{
+			$loginError = '<div class="alert alert-danger">Falscher Benutzername oder Passwort.</div>';
+		}
+		mysqli_stmt_free_result($stmt);
+		mysqli_stmt_close($stmt);
+	}
+}
+
+
+
+
+
+
+/* create a prepared statement */
+	$stmt = mysqli_stmt_init($conn);
+	if (mysqli_stmt_prepare($stmt, "SELECT cBenutzerID, cUsername, cNachname, cVorname, cRolle FROM tbenutzer WHERE cUsername=? and cPasswort=?")) 
+	{
+		mysqli_stmt_bind_param($stmt, "ss", $username, $password);
+		mysqli_stmt_execute($stmt);
+		//$result = mysqli_stmt_get_result($stmt);
+		
+// 		if ($result->num_rows > 0)
+// 		{	
+// 			mysqli_fetch_array($result, MYSQLI_NUM);
+// 			foreach ($result as $row)
+// 			{
+		mysqli_stmt_bind_result($stmt, $id, $username, $nachname, $vorname, $rolle);
+		while(mysqli_stmt_fetch($stmt)){
+			
+				// Save Session Variables
+				$_SESSION["user_id"] = $id;//$row["cBenutzerID"];
+				$_SESSION["user_username"] = $username;//$row["cUsername"];
+				$_SESSION["user_nachname"] = $nachname;//$row["cNachname"];
+				$_SESSION["user_vorname"] = $vorname;//$row["cVorname"];
+				$_SESSION["user_role"] = $rolle;//$row["cRolle"];
+				
+				// Redirect to chosen Page
+				header("Location: ".$startPage);
+			}
+		}
+		else
+		{
+			$loginError = '<div class="alert alert-danger">Falscher Benutzername oder Passwort.</div>';
+		}
+		//mysqli_stmt_free_result($stmt);
+		mysqli_stmt_close($stmt);

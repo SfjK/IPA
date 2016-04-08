@@ -27,6 +27,10 @@ body {
     
 }
 
+.form-horizontal .control-label {
+    text-align: left;
+}
+
 
 @media (max-width: 1150px) {
     .navbar-header {

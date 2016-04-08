@@ -52,7 +52,7 @@ if ($navbar === 1)
                     echo '</li>';
                     echo '<li>';
                     	echo '<a href="profil.php"><span class="glyphicon glyphicon-user"></span>'; 
-                    		echo " {$uservorname}  {$usernachname}";  
+                    		echo " {$userVorname}  {$userNachname}";  
                     	echo'</a>';
                     echo '</li>';
                     echo '<li class="dropdown">';
@@ -110,7 +110,7 @@ if ($navbar === 2)
 	            	echo '</l>';
 	            	echo '<li>';
 	                	echo '<a href="profil.php"><span class="glyphicon glyphicon-user"></span>'; 
-	                		echo " {$uservorname}  {$usernachname}"; 
+	                		echo " {$userVorname}  {$userNachname}"; 
 	                	echo'</a>';
 	                echo '</li>';
 	                echo '<li>';
