@@ -16,8 +16,10 @@ include ('include/footer.inc.php');
 ?>
 
 <div class="container">
-	<h2>Usermanager</h2>
 	<form class="form-horizontal" role="form">
+		<div class="form-group form-group">
+			<h2 class="col-md-4 control-label">Usermanager</h2>
+		</div>
 		<div class="form-group form-group">
         	<div class="col-sm-10"></div>	
 			<div class="col-sm-2">
