@@ -3,9 +3,11 @@
 $title = "TSW │ Benutzerdetail";
 $header = "normal";
 $navbar = 1;
-
 $validationError = "";
 $error = 0;
+$active = 1;
+$notactive = 0;
+$detailId = $_GET['id'];
 
 /** Includes */
 include ('include/header.inc.php');
@@ -16,13 +18,11 @@ include ('include/checkrole.inc.php');
 include ('include/navigation.inc.php');
 include ('include/footer.inc.php');
 
-$detailId = $_GET['id'];
-
-if(isset($_POST['delete-user']))
+if(isset($_POST['deactivate-user']))
 {
 	$stmt = mysqli_stmt_init($conn);
-	mysqli_stmt_prepare($stmt, "DELETE FROM tbenutzer WHERE cBenutzerID=?");
-	mysqli_stmt_bind_param($stmt, "i", $detailId);
+	mysqli_stmt_prepare($stmt, "UPDATE tbenutzer SET cAktiv=? WHERE cBenutzerID=?");
+	mysqli_stmt_bind_param($stmt, "ii", $notactive, $detailId);
 	mysqli_stmt_execute($stmt);
 	mysqli_stmt_free_result($stmt);
 	mysqli_stmt_close($stmt);
@@ -145,15 +145,15 @@ if(isset($_POST['save-user']))
 }
 
 $stmt = mysqli_stmt_init($conn);
-if (mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer Where cBenutzerID=?"))
+if (mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer Where cBenutzerID=? && cAktiv=?"))
 {
-	mysqli_stmt_bind_param($stmt, "i", $detailId);
+	mysqli_stmt_bind_param($stmt, "ii", $detailId,$active);
 	mysqli_stmt_execute($stmt);
 	mysqli_stmt_store_result($stmt);
 
 	if (mysqli_stmt_num_rows($stmt) > 0)
 	{
-		mysqli_stmt_bind_param($stmt, "i", $detailId);
+		mysqli_stmt_bind_param($stmt,"ii", $detailId,$active);
 		mysqli_stmt_execute($stmt);
 
 		$result = mysqli_stmt_get_result($stmt);
@@ -210,7 +210,7 @@ if (mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer Where cBenutzerID=?"))
 					echo '</div>';
 				echo '</div>';
 				echo '<div class="form-group">';
-					echo '<label class="col-md-2 control-label">E-Mail Adresse</label>';
+					echo '<label class="col-md-2 control-label">E-Mail Adresse *</label>';
 					echo '<div class="col-md-4">';
 						echo '<input class="form-control" id="focusedInput" name="email" value="';
 							echo $pEmail;  // MAIL
@@ -259,9 +259,9 @@ if (mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer Where cBenutzerID=?"))
 					echo '</div>';
 				echo '</div>';
 				echo '<div class="form-group">';
-					echo '<label class="col-md-4 control-label"></label>';
+					echo '<label class="col-md-2 control-label"></label>';
 					echo '<div class="col-md-2">';
-						echo '<button class="btn btn-danger btn-block" name="delete-user" type="submit" >Delete</button>';
+						echo '<button class="btn btn-danger btn-block" name="deactivate" type="submit" >User deaktivieren</button>';
 					echo '</div>';
 				echo '</div>';
 				echo '<div class="form-group">';
@@ -275,7 +275,7 @@ if (mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer Where cBenutzerID=?"))
 	}
 	else
 	{
-		echo '<div class="container"><div class="alert alert-danger"> <strong>Error: </strong>Dieser User existiert nicht.</div></div>';
+		echo '<div class="container"><div class="alert alert-danger"><strong>Error: </strong>Dieser User existiert nicht.</div></div>';
 	}
 	mysqli_stmt_free_result($stmt);
 	mysqli_stmt_close($stmt);

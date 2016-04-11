@@ -1,5 +1,5 @@
 <?php
-/** Variables */
+/** variables */
 $title = "TSW │ Profil";
 $header = "normal";
 $navbar = 1;
@@ -7,13 +7,13 @@ $navbar = 1;
 $validationError = "";
 $error = 0;
 
-/** Includes */
+/** includes */
 include ('include/header.inc.php');
 include ('include/functioncontroller.inc.php');
 include ('include/dbconnection.inc.php');
 include ('include/checkauth.inc.php');
 
-/** Post-Back for Login */
+/** post-back for profile */
 if(isset($_POST['update-profile']))
 {
 	$userVorname = $_POST["vorname"];
@@ -29,16 +29,26 @@ if(isset($_POST['update-profile']))
 	$userPhone = strip_tags($userPhone);
 	$userMobile = strip_tags($userMobile);
 	
-	/** Validation */
+	/** validation */
 	
 	if (mb_strlen($userVorname, 'utf8')  > 32)
 	{
 		$validationError .= "Fehler: Der Vorname ist zu lang. Er darf maximal 32 Zeichen enthalten.";
 		$error = 1;
 	}
+	if (mb_strlen($userVorname, 'utf8')  < 3)
+	{
+		$validationError .= "Fehler: Der Vorname ist zu kurz. Er darf minimal 3 Zeichen enthalten.";
+		$error = 1;
+	}
 	if (mb_strlen($userNachname, 'utf8')  > 32)
 	{
 		$validationError .= "Fehler: Der Nachname ist zu lang. Er darf maximal 32 Zeichen enthalten.";
+		$error = 1;
+	}
+	if (mb_strlen($userNachname, 'utf8')  < 3)
+	{
+		$validationError .= "Fehler: Der Nachname ist zu kurz. Er darf minimal 3 Zeichen enthalten.";
 		$error = 1;
 	}
 	if (mb_strlen($userEmail, 'utf8')  > 255)
@@ -48,12 +58,12 @@ if(isset($_POST['update-profile']))
 	}
 	if(!preg_match("/^[0-9]{13}$/", $userPhone)) 
 	{
-		$validationError .= "Fehler: Geben Sie eine gültige Telefon-Nummer ein.";
+		$validationError .= "Fehler: Geben Sie eine gültige Telefon-Nummer ein. Bsp. 0041000000000";
 		$error = 1;
 	}
 	if(!preg_match("/^[0-9]{13}$/", $userMobile)) 
 	{
-		$validationError .= "Fehler: Geben Sie eine gültige Mobiltelefon-Nummer ein.";
+		$validationError .= "Fehler: Geben Sie eine gültige Mobiltelefon-Nummer ein. Bsp. 0041000000000";
 		$error = 1;
 	}
 	if (!filter_var($userEmail, FILTER_VALIDATE_EMAIL)) {
@@ -171,6 +181,12 @@ if (mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer Where cBenutzerID=?"))
 					echo '</div>';
 				echo '</div>';
 				echo '<div class="form-group">';
+					echo '<label class="col-md-2 control-label"></label>';
+					echo '<div class="col-md-4 control-txt">';
+						echo 'Passwort ändern:';
+					echo '</div>';
+				echo '</div>';
+				echo '<div class="form-group">';
 					echo '<label class="col-md-2 control-label">Neues Passwort</label>';
 					echo '<div class="col-md-4">';
 						echo '<input type="password" class="form-control" name="passwort" id="focusedInput" value=""';
@@ -180,7 +196,7 @@ if (mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer Where cBenutzerID=?"))
 				echo '<div class="form-group">';
 					echo '<label class="col-md-2 control-label"></label>';
 					echo '<div class="col-md-2">';
-						echo '<input type="hidden" name="_updateProfile" value="true">';
+					
 						echo '<button class="btn btn-primary btn-block" type="submit" name="update-profile">Speichern</button>';
 					echo '</div>';
 					echo '<div class="col-md-2">';
@@ -198,17 +214,12 @@ if (mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer Where cBenutzerID=?"))
 	}
 	else
 	{
-		echo '<div class="container"><div class="alert alert-danger"> <strong>Error: </strong>Dieser User existiert nicht.</div></div>';
+		echo '<div class="container"><div class="alert alert-danger"><strong>Error: </strong>Dieser User existiert nicht.</div></div>';
 	}
 	mysqli_stmt_free_result($stmt);
 	mysqli_stmt_close($stmt);
 }
-	
-	
-	
-	
 
-/** Includes */
-
+/** includes */
 include ('include/footer.inc.php');
 ?>

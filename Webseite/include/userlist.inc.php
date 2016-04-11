@@ -1,13 +1,13 @@
 <?php
 $stmt = mysqli_stmt_init($conn);
-mysqli_stmt_prepare($stmt, 'SELECT cBenutzerID AS ID, cUsername AS Username, CONCAT(cVorname," ", cNachname) AS Name, trollen.cRolleBeschreibung AS Rolle FROM tbenutzer INNER JOIN trollen ON tbenutzer.cRolle = trollen.cRolle');
+mysqli_stmt_prepare($stmt, 'SELECT cBenutzerID AS ID, cUsername AS Username, CONCAT(cVorname," ", cNachname) AS Name, trollen.cRolleBeschreibung AS Rolle FROM tbenutzer INNER JOIN trollen ON tbenutzer.cRolle = trollen.cRolle WHERE tbenutzer.cAktiv=1');
 mysqli_stmt_execute($stmt);
 mysqli_stmt_store_result($stmt);
 	
 if (mysqli_stmt_num_rows($stmt) > 0)
 {
 	mysqli_stmt_close($stmt);
-	$sql = 'SELECT cBenutzerID AS ID, cUsername AS Username, CONCAT(cVorname," ", cNachname) AS Name, trollen.cRolleBeschreibung AS Rolle FROM tbenutzer INNER JOIN trollen ON tbenutzer.cRolle = trollen.cRolle';
+	$sql = 'SELECT cBenutzerID AS ID, cUsername AS Username, CONCAT(cVorname," ", cNachname) AS Name, trollen.cRolleBeschreibung AS Rolle FROM tbenutzer INNER JOIN trollen ON tbenutzer.cRolle = trollen.cRolle WHERE tbenutzer.cAktiv=1';
 	$result = mysqli_query($conn, $sql);
 	$arrayKeys = mysqli_fetch_fields($result);
 	

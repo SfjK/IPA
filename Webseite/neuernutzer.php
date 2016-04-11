@@ -56,21 +56,25 @@ if(isset($_POST['neuer-nutzer']))
 		$validationError .= "Fehler: Der Vorname ist zu lang. Er darf maximal 32 Zeichen enthalten.";
 		$error = 1;
 	}
+	
 	if (mb_strlen($newUserNachname, 'utf8')  > 32)
 	{
 		$validationError .= "Fehler: Der Nachname ist zu lang. Er darf maximal 32 Zeichen enthalten.";
 		$error = 1;
 	}
+	
 	if (mb_strlen($newUserName, 'utf8')  > 32)
 	{
 		$validationError .= "Fehler: Der Username ist zu lang. Er darf maximal 32 Zeichen enthalten.";
 		$error = 1;
 	}
+	
 	if (mb_strlen($newUserEmail, 'utf8')  > 255)
 	{
 		$validationError .= "Fehler: Die E-Mail-Adresse ist zu lang. Er darf maximal 255 Zeichen enthalten.";
 		$error = 1;
 	}
+	
 	if ($newUserPhone != 0)
 	{
 		if(!preg_match("/^[0-9]{13}$/", $newUserPhone))
@@ -79,6 +83,7 @@ if(isset($_POST['neuer-nutzer']))
 			$error = 1;
 		}
 	}
+	
 	if ($newUserMobile != 0)
 	{
 		if(!preg_match("/^[0-9]{13}$/", $newUserMobile))
@@ -124,15 +129,10 @@ if(isset($_POST['neuer-nutzer']))
 		mysqli_stmt_bind_param($stmt, "sssssssi", $newUserVorname, $newUserNachname, $newUserName, $newUserEmail, $newUserPhone, $newUserMobile, $newUserPasswort, $newUserRolle);
 		mysqli_stmt_execute($stmt);
 		mysqli_stmt_close($stmt);
-	}
-	
-		
+	}	
 }
-
-
-
-
 ?>
+
 <div class="container">
 	<form class="form-horizontal" role="form" method="post" autocomplete="off">
 	
