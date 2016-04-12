@@ -51,79 +51,17 @@ if(isset($_POST['neuer-nutzer']))
 		$newUserRolle = "2";
 	}
 	
-	if (mb_strlen($newUserVorname, 'utf8')  > 32)
+	
+	$validationError = validateUser($conn, $newUserVorname, $newUserNachname, $newUserName, $newUserPhone, $newUserMobile, $newUserEmail, "", $validationError);
+	if (!empty($validationError))
 	{
-		$validationError .= "Fehler: Der Vorname ist zu lang. Er darf maximal 32 Zeichen enthalten.";
-		$error = 1;
+		$validationError = '<div class="alert alert-danger">'.$validationError.'</div>';
 	}
 	
-	if (mb_strlen($newUserNachname, 'utf8')  > 32)
-	{
-		$validationError .= "Fehler: Der Nachname ist zu lang. Er darf maximal 32 Zeichen enthalten.";
-		$error = 1;
-	}
-	
-	if (mb_strlen($newUserName, 'utf8')  > 32)
-	{
-		$validationError .= "Fehler: Der Username ist zu lang. Er darf maximal 32 Zeichen enthalten.";
-		$error = 1;
-	}
-	
-	if (mb_strlen($newUserEmail, 'utf8')  > 255)
-	{
-		$validationError .= "Fehler: Die E-Mail-Adresse ist zu lang. Er darf maximal 255 Zeichen enthalten.";
-		$error = 1;
-	}
-	
-	if ($newUserPhone != 0)
-	{
-		if(!preg_match("/^[0-9]{13}$/", $newUserPhone))
-		{
-			$validationError .= "Fehler: Geben Sie eine gültige Telefon-Nummer ein.";
-			$error = 1;
-		}
-	}
-	
-	if ($newUserMobile != 0)
-	{
-		if(!preg_match("/^[0-9]{13}$/", $newUserMobile))
-		{
-			$validationError .= "Fehler: Geben Sie eine gültige Mobiltelefon-Nummer ein.";
-			$error = 1;
-		}
-	}
-	if (!filter_var($newUserEmail, FILTER_VALIDATE_EMAIL)) {
-		$validationError .= "Fehler: Geben Sie eine gültige E-mail Adresse an ein.";
-		$error = 1;
-	}
-	
-	$stmt = mysqli_stmt_init($conn);
-	mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer WHERE cEmail=?");
-	mysqli_stmt_bind_param($stmt, "s", $newUserEmail);
-	mysqli_stmt_execute($stmt);
-	mysqli_stmt_store_result($stmt);
-	if (mysqli_stmt_num_rows($stmt) > 0)
-	{
-		$validationError .= "Fehler: Die angegebene E-mail wird bereits wird bereits verwendet. Bitte geben Sie eine andere an.";
-		$error = 1;
-	}
-	mysqli_stmt_close($stmt);
-	
-	$stmt = mysqli_stmt_init($conn);
-	mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer WHERE cUsername=?");
-	mysqli_stmt_bind_param($stmt, "s", $newUserName);
-	mysqli_stmt_execute($stmt);
-	mysqli_stmt_store_result($stmt);
-	if (mysqli_stmt_num_rows($stmt) > 0)
-	{
-		$validationError .= "Fehler: Es existiert bereits ein User mit diesem Username. Nutzen Sie bitte einen anderen.";
-		$error = 1;
-	}
-	mysqli_stmt_close($stmt);
-	
-	if ($error == 0)
+	if (empty($validationError))
 	{
 		$newUserPasswort = toSha($newUserPasswort);
+		
 		$stmt = mysqli_stmt_init($conn);
 		mysqli_stmt_prepare($stmt, 'INSERT INTO tbenutzer SET cVorname=?, cNachname=?,  cUsername=?, cEmail=?, cPhone=?, cMobile=?, cPasswort=?, cRolle=?');
 		mysqli_stmt_bind_param($stmt, "sssssssi", $newUserVorname, $newUserNachname, $newUserName, $newUserEmail, $newUserPhone, $newUserMobile, $newUserPasswort, $newUserRolle);
@@ -170,13 +108,13 @@ if(isset($_POST['neuer-nutzer']))
 		<div class="form-group">
 			<label class="col-md-2 control-label">Telephonnummer</label>
 			<div class="col-md-4">
-				<input type="text" class="form-control" id="focusedInput" name="phone" value="<?php echo $newUserPhone ?>" type="text">
+				<input type="text" class="form-control" id="focusedInput" name="phone" value="<?php echo $newUserPhone ?>" type="text" placeholder="0041000000000">
 			</div>
 		</div>
 		<div class="form-group">
 			<label class="col-md-2 control-label">Handynummer</label>
 			<div class="col-md-4">
-				<input type="text" class="form-control" id="focusedInput" name="mobile" value="<?php echo $newUserMobile ?>"type="text">
+				<input type="text" class="form-control" id="focusedInput" name="mobile" value="<?php echo $newUserMobile ?>"type="text" placeholder="0041000000000">
 			</div>
 		</div>
 		<div class="form-group">

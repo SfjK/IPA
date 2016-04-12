@@ -47,77 +47,20 @@ if(isset($_POST['save-user']))
 	$userPhone = strip_tags($userPhone);
 	$userMobile = strip_tags($userMobile);
 	
-	if (mb_strlen($userVorname, 'utf8')  > 32)
+
+	/** validation */
+	$validationError = validateUser($conn, $userVorname, $userNachname,"", $userPhone, $userMobile, $userEmail, $detailId, $validationError);
+	if (!empty($validationError))
 	{
-		$validationError .= "Fehler: Der Vorname ist zu lang. Er darf maximal 32 Zeichen enthalten.";
-		$error = 1;
-	}
-	if (mb_strlen($userNachname, 'utf8')  > 32)
-	{
-		$validationError .= "Fehler: Der Nachname ist zu lang. Er darf maximal 32 Zeichen enthalten.";
-		$error = 1;
-	}
-	if (mb_strlen($userName, 'utf8')  > 32)
-	{
-		$validationError .= "Fehler: Der Username ist zu lang. Er darf maximal 32 Zeichen enthalten.";
-		$error = 1;
-	}
-	if (mb_strlen($userEmail, 'utf8')  > 255)
-	{
-		$validationError .= "Fehler: Die E-Mail-Adresse ist zu lang. Er darf maximal 255 Zeichen enthalten.";
-		$error = 1;
-	}
-	if ($userPhone != 0)
-	{
-		if(!preg_match("/^[0-9]{13}$/", $userPhone))
-		{
-			$validationError .= "Fehler: Geben Sie eine gültige Telefon-Nummer ein.";
-			$error = 1;
-		}
-	}
-	if ($userMobile != 0)
-	{
-		if(!preg_match("/^[0-9]{13}$/", $userMobile))
-		{
-			$validationError .= "Fehler: Geben Sie eine gültige Mobiltelefon-Nummer ein.";
-			$error = 1;
-		}
-	}
-	if (!filter_var($userEmail, FILTER_VALIDATE_EMAIL)) {
-		$validationError .= "Fehler: Geben Sie eine gültige E-mail Adresse an ein.";
-		$error = 1;
+		$validationError = '<div class="alert alert-danger">'.$validationError.'</div>';
 	}
 	
-	$stmt = mysqli_stmt_init($conn);
-	mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer WHERE cEmail=? && cBenutzerID!=?");
-	mysqli_stmt_bind_param($stmt, "ss", $userEmail, $detailId);
-	mysqli_stmt_execute($stmt);
-	mysqli_stmt_store_result($stmt);
-	if (mysqli_stmt_num_rows($stmt) > 0)
-	{
-		$validationError .= "Fehler: Die angegebene E-mail wird bereits wird bereits verwendet. Bitte geben Sie eine andere an.";
-		$error = 1;
-	}
-	mysqli_stmt_close($stmt);
-	
-	$stmt = mysqli_stmt_init($conn);
-	mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer WHERE cUsername=? && cBenutzerID!=?");
-	mysqli_stmt_bind_param($stmt, "ss", $userName, $detailId);
-	mysqli_stmt_execute($stmt);
-	mysqli_stmt_store_result($stmt);
-	if (mysqli_stmt_num_rows($stmt) > 0)
-	{
-		$validationError .= "Fehler: Es existiert bereits ein User mit diesem Username. Nutzen Sie bitte einen anderen.";
-		$error = 1;
-	}
-	mysqli_stmt_close($stmt);
-	
-	if ($error == 0)
+	if (empty($validationError))
 	{
 		$_SESSION["user_nachname"] = $userNachname;
 		$_SESSION["user_vorname"] = $userVorname;
 		
-		if ($userPasswort === "")
+		if (empty($userPasswort))
 		{
 			$stmt = mysqli_stmt_init($conn);
 			mysqli_stmt_prepare($stmt, 'UPDATE tbenutzer SET cVorname=?, cNachname=?, cEmail=?, cPhone=?, cMobile=? ,cRolle=? WHERE cBenutzerID=?');
@@ -130,7 +73,7 @@ if(isset($_POST['save-user']))
 			$userPasswort = toSha($userPasswort);
 			$stmt = mysqli_stmt_init($conn);
 			mysqli_stmt_prepare($stmt, 'UPDATE tbenutzer SET cVorname=?, cNachname=?, cEmail=?, cPhone=?, cMobile=? ,cPasswort=?,cRolle=? WHERE cBenutzerID=?');
-			mysqli_stmt_bind_param($stmt, "ssssssi", $userVorname, $userNachname, $userEmail, $userPhone, $userMobile, $userPasswort ,$userRolle, $detailId);
+			mysqli_stmt_bind_param($stmt, "ssssssii", $userVorname, $userNachname, $userEmail, $userPhone, $userMobile, $userPasswort ,$userRolle, $detailId);
 			mysqli_stmt_execute($stmt);
 			mysqli_stmt_close($stmt);
 		}
@@ -222,7 +165,7 @@ if (mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer Where cBenutzerID=? && c
 					echo '<div class="col-md-4">';
 						echo '<input class="form-control" id="focusedInput" name="phone" value="';
 							echo $pPhone; // PHONE
-						echo'"type="text">';
+						echo'"type="text" placeholder="0041000000000">';
 					echo '</div>';
 				echo '</div>';
 				echo '<div class="form-group">';
@@ -230,7 +173,7 @@ if (mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer Where cBenutzerID=? && c
 					echo '<div class="col-md-4">';
 						echo '<input class="form-control" id="focusedInput" name="mobile" value="';
 							echo $pMobile; // MOBILE
-						echo'"type="text">';
+						echo'"type="text" placeholder="0041000000000">';
 					echo '</div>';
 				echo '</div>';
 				echo '<div class="form-group">';

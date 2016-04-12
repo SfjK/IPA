@@ -8,7 +8,6 @@ $ticketError = "";
 $dateError = "";
 $ticketTitle = "";
 $ticketDesc = "";
-$createMessage = "";
 $dateOk = "";
 
 /** includes */
@@ -18,7 +17,59 @@ include ('include/pdoclass.inc.php');
 include ('include/checkauth.inc.php');
 include ('include/functioncontroller.inc.php');
 include ('include/navigation.inc.php');
+include ('include/sendmail.inc.php');
 include ('include/footer.inc.php');
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST')
+{
+	$tickettitle = $_POST["ticket-title"];
+	$ticketkategorieid = $_POST["ticket-thema"];
+	$ticketdesc = $_POST["ticket-beschreibung"];
+	$ticketdeadline = $_POST["ticket-endtermin"];
+
+	$tickettitle = strip_tags($tickettitle);
+	$ticketdesc = strip_tags($ticketdesc);
+
+	$currentdate = date('Y-m-d H:i:s');
+	$checkdeadline = $_POST["ticket-endtermin"];
+
+	$dateOk = 1;
+	if(empty($checkdeadline))
+	{
+		$dateOk = 1;
+	}
+	elseif ($checkdeadline < $currentdate)
+	{
+		$dateError = "<div class='alert alert-danger'>Die Deadline kann nicht vor dem Erstellungsdatum des Tickets liegen</div>";
+		$dateOk = 0;
+	}
+
+	if ($dateOk == 1)
+	{
+		$con=dbConn::getConnection();
+		if(isset($_POST['save-ticket']))
+		{
+			$ticketError = createNewTicket($con, $_FILES);
+			if (empty($ticketError))
+			{
+				$stmt = $con->prepare('SELECT * FROM ttickets WHERE cOwnerID=:ticketowner');
+				$stmt->bindParam(':ticketowner', $userid, PDO::PARAM_STR);
+				$last_ticketid = $con->lastInsertId();
+				$stmt->execute();
+				header("Location: ticket_details.php?id=$last_ticketid");		
+			}
+		}
+
+		if(isset($_POST['save-goback']))
+		{
+			$ticketError = createNewTicket($con, $_FILES);
+			if (empty($ticketerror))
+			{
+				header("Location: index.php");
+			}
+		}
+	}
+}
 ?>
 
 <div class="container">
@@ -37,10 +88,7 @@ include ('include/footer.inc.php');
 	        <div class="col-sm-8">
 		        <select class="form-control" name="ticket-thema" required>
 		        <?php 
-		        $con=dbConn::getConnection();
-		        $stmt = $con->prepare('SELECT cKategorieID, cKategorieName FROM tkategorie');
-		        $stmt->execute();
-		        $rkategorie = $stmt->fetchAll(PDO::FETCH_ASSOC); //gibt array zurück
+		        $rkategorie = getEveryCategory();
 		        
 		        foreach ($rkategorie as $key => $row)
 		        {
@@ -58,14 +106,19 @@ include ('include/footer.inc.php');
 		</div>
         <div class="form-group">
 	        <label class="col-sm-2 control-label">Endtermin</label>
-	        <div class="col-sm-8">
-		        <div class="input-group date" id="datetimepicker2">
-			        <input type="text" class="form-control" placeholder="YYYY-MM-DD HH:MM:SS" name="ticket-endtermin"/>
+	        <div class="col-sm-7">
+		        <div class="input-group date" id="datetimepicker2" >
+			        <input type="text" class="form-control" placeholder="YYYY-MM-DD HH:MM:SS" name="ticket-endtermin" readonly/>
 			        <span class="input-group-addon">
 			        	<span class="glyphicon glyphicon-calendar"></span>
 			        </span>
 		        </div>
-	        </div>    
+	        </div>
+	       	<div class="col-sm-1">
+				<button class="btn btn-default btn-block" type="button" onClick="resetEndtermin(); return false;">
+					<span class="glyphicon glyphicon-remove"></span>
+				</button>
+			</div>
         </div>
         <div class="form-group">
         	<label class="col-sm-2 control-label">Datei</label>
@@ -76,7 +129,7 @@ include ('include/footer.inc.php');
 		<div class="form-group" >
 			<div class="col-sm-2"></div>
 			<div class="col-sm-4">
-				<button class="btn btn-primary btn-block" name="save-goback" type="submit">Speichern und Schliessen</button>
+				<button class="btn btn-primary btn-block" name="save-goback" type="submit">Speichern und Zurück</button>
 			</div>
 			<div class="col-sm-2">
 				<button class="btn btn-default btn-block" name="save-ticket" type="submit">Speichern</button>
@@ -102,6 +155,13 @@ $(function ()
 	$('#datetimepicker2').datetimepicker(
 	{
 		format: 'YYYY-MM-DD HH:mm:ss',
+		locale: moment.locale('de'),
+		toolbarPlacement: 'top'
+		
 	});
+	$('#datetimepicker2').data("DateTimePicker").ignoreReadonly(true);
+
 });
+
+
 </script>   

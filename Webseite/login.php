@@ -32,7 +32,7 @@ if(isset($_POST['log-in']))
 	/** Starts Session */
 	session_start();
 	
-	/** Get PW and Nema for Login */
+	/** Get PW and Name for Login */
 	$username = $_POST["username"];
 	$password = $_POST["password"];
 	

@@ -1,0 +1,15 @@
+Change Admin Navbar to display the Usermanager not in a dropdown
+E-Mail - Error when E-Mail is not sent
+benutzer_details - changed save pw sql to work
+Umlaute in E-Maiol gefixt
+E-mail variabel geändert
+added comments to sendemail
+finished commenting sendmail
+fixed validation in profil
+made validation function
+create ticket functions dazugenommen
+Change database fieldtypes
+change kategories
+Add neues Ticket funktion
+Add Ticketvalidierung
+Add Upload funktion mit salt

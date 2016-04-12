@@ -16,78 +16,37 @@ include ('include/checkauth.inc.php');
 /** post-back for profile */
 if(isset($_POST['update-profile']))
 {
-	$userVorname = $_POST["vorname"];
-	$userNachname = $_POST["nachname"];
+	$tempVorname = $_POST["vorname"];
+	$tempNachname = $_POST["nachname"];
 	$userEmail= $_POST["email"];
 	$userPhone = $_POST["phone"];
 	$userMobile = $_POST["mobile"];
 	$userPasswort = $_POST["passwort"];
 	
-	$userVorname = strip_tags($userVorname);
-	$userNachname = strip_tags($userNachname);
+	$validationError = "";
+	$error = 0;
+	
+	$tempVorname = strip_tags($tempVorname);
+	$tempNachname = strip_tags($tempNachname);
 	$userEmail = strip_tags($userEmail);
 	$userPhone = strip_tags($userPhone);
 	$userMobile = strip_tags($userMobile);
 	
 	/** validation */
-	
-	if (mb_strlen($userVorname, 'utf8')  > 32)
+	$validationError = validateUser($conn, $tempVorname, $tempNachname,"", $userPhone, $userMobile, $userEmail, $userid, $validationError);
+	if (!empty($validationError))
 	{
-		$validationError .= "Fehler: Der Vorname ist zu lang. Er darf maximal 32 Zeichen enthalten.";
-		$error = 1;
-	}
-	if (mb_strlen($userVorname, 'utf8')  < 3)
-	{
-		$validationError .= "Fehler: Der Vorname ist zu kurz. Er darf minimal 3 Zeichen enthalten.";
-		$error = 1;
-	}
-	if (mb_strlen($userNachname, 'utf8')  > 32)
-	{
-		$validationError .= "Fehler: Der Nachname ist zu lang. Er darf maximal 32 Zeichen enthalten.";
-		$error = 1;
-	}
-	if (mb_strlen($userNachname, 'utf8')  < 3)
-	{
-		$validationError .= "Fehler: Der Nachname ist zu kurz. Er darf minimal 3 Zeichen enthalten.";
-		$error = 1;
-	}
-	if (mb_strlen($userEmail, 'utf8')  > 255)
-	{
-		$validationError .= "Fehler: Die E-Mail-Adresse ist zu lang. Er darf maximal 255 Zeichen enthalten.";
-		$error = 1;
-	}
-	if(!preg_match("/^[0-9]{13}$/", $userPhone)) 
-	{
-		$validationError .= "Fehler: Geben Sie eine gültige Telefon-Nummer ein. Bsp. 0041000000000";
-		$error = 1;
-	}
-	if(!preg_match("/^[0-9]{13}$/", $userMobile)) 
-	{
-		$validationError .= "Fehler: Geben Sie eine gültige Mobiltelefon-Nummer ein. Bsp. 0041000000000";
-		$error = 1;
-	}
-	if (!filter_var($userEmail, FILTER_VALIDATE_EMAIL)) {
-		$validationError .= "Fehler: Geben Sie eine gültige E-mail Adresse an ein.";
-		$error = 1;
+		$validationError = '<div class="alert alert-danger">'.$validationError.'</div>';
 	}
 	
-	$stmt = mysqli_stmt_init($conn);
-	mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer WHERE cEmail=? && cBenutzerID!=?");
-	mysqli_stmt_bind_param($stmt, "si", $userEmail, $userid);
-	mysqli_stmt_execute($stmt);
-	mysqli_stmt_store_result($stmt);
-	if (mysqli_stmt_num_rows($stmt) > 0)
+	if (empty($validationError))
 	{
-		$validationError .= "Fehler: Die angegebene E-mail wird bereits wird bereits verwendet. Bitte geben Sie eine andere an.";
-		$error = 1;
-	}
-	mysqli_stmt_close($stmt);
-	
-	if ($error == 0)
-	{
+		$userNachname = $tempNachname;
+		$userVorname = $tempVorname;
 		$_SESSION["user_nachname"] = $userNachname;
 		$_SESSION["user_vorname"] = $userVorname;
-		if ($userPasswort === "")
+		
+		if (empty($userPasswort))
 		{
 			$stmt = mysqli_stmt_init($conn);
 			mysqli_stmt_prepare($stmt, 'UPDATE tbenutzer SET cVorname=?, cNachname=?, cEmail=?, cPhone=?, cMobile=? WHERE cBenutzerID=?');
@@ -110,7 +69,7 @@ if(isset($_POST['update-profile']))
 include ('include/navigation.inc.php');	
 	
 $stmt = mysqli_stmt_init($conn);
-if (mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer Where cBenutzerID=?"))
+if (mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer WHERE cBenutzerID=?"))
 {
 	mysqli_stmt_bind_param($stmt, "i", $userid);
 	mysqli_stmt_execute($stmt);
@@ -127,7 +86,7 @@ if (mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer Where cBenutzerID=?"))
 		foreach ($result as $row)
 		{
 			$pVorname = $row["cVorname"];
-			$pNachname= $row["cNachname"];
+			$pNachname = $row["cNachname"];
 			$pEmail= $row["cEmail"];
 			$pPhone = $row["cPhone"];
 			$pMobile = $row["cMobile"];
@@ -196,7 +155,6 @@ if (mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer Where cBenutzerID=?"))
 				echo '<div class="form-group">';
 					echo '<label class="col-md-2 control-label"></label>';
 					echo '<div class="col-md-2">';
-					
 						echo '<button class="btn btn-primary btn-block" type="submit" name="update-profile">Speichern</button>';
 					echo '</div>';
 					echo '<div class="col-md-2">';

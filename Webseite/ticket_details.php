@@ -5,7 +5,7 @@ $header = "normal";
 $navbar = 1;
 
 /** get ticket id */
-$tid = $_GET['id'];
+$ticketID = $_GET['id'];
 
 /** includes */
 include ('include/header.inc.php');
@@ -17,13 +17,78 @@ include ('include/navigation.inc.php');
 include ('include/sendmail.inc.php');
 include ('include/footer.inc.php');
 
-if(isset($_POST['save-ticket']))
+/** post-back for saving ticket */
+if ($_SERVER['REQUEST_METHOD'] === 'POST')
 {
+	/** get post */
+	$ticketTitle = $_POST["ticket-title"];
+	$ticketThema = $_POST["ticket-thema"];
+	$ticketBeschreibung = $_POST["ticket-beschreibung"];
+	$ticketSupporter = $_POST["ticket-supporter"];
+	$ticketErstellungsdatum = $_POST["ticket-erstellungsdatum"];
+	$ticketEndtermin = $_POST["ticket-endtermin"];
+	$ticketStatus = $_POST["ticket-status"];
+	
+	/** strip variables */
+	$ticketTitle = strip_tags($ticketTitle);
+	$ticketBeschreibung = strip_tags($ticketBeschreibung);
+	$ticketErstellungsdatum = strip_tags($ticketErstellungsdatum);
+	$ticketEndtermin = strip_tags($ticketEndtermin);
+	
+	/** get the old ticket data */
+	$result = getOldTicketData($ticketID);
+	
+	/** variables for old ticketdata */
+	$oldSupporterID = $result["SupportID"];
+	$oldOwner = $result["Owner"];
+	$oldSupporter = $result["Supporter"];
+	$oldStatusID = $result["StatusID"];
+	$oldOwnerEmail = $result["Email"];
+	$oldSupportEmail = $result["Emailsupporter"];
+	
+	/** get the new ticketsupporter data */
+	$resultForSupporter = getNewSupporter($ticketSupporter); 
+	$newSupporter = $resultForSupporter["cUsername"];
+	
+	/** get the new ticketstatus data */
+	$resultForStatus = getNewStatusData($ticketStatus);
+	$newStatus = $resultForStatus["cStatusName"];
+	
+	/** get the supporter email */
+	$resultForSupporter = getSupporterEmail($ticketSupporter);
+	$supportEmail = $resultForSupporter["cEmail"];
+	
+	/** 
+	 * check if supporter is altert and send mail 
+	 */
+	if ($oldSupporterID != $ticketSupporter)
+	{
+		/** send mail */
+		sendMail($ticketID, $ticketTitle, $oldOwner, "Administrator zugewiesen", "", "", $newSupporter, $ticketStatus, $oldOwnerEmail);
+		sendMail($ticketID, $ticketTitle, $oldOwner, "Administrator E-Mail", "", "", $newSupporter, $ticketStatus, $supportEmail);
+	}
+	
+	/**
+	 * check if status is altert and send mail
+	 */
+	if ($oldStatusID != $ticketStatus)
+	{
+		/** send mail */
+		sendMail($ticketID, $ticketTitle, $oldOwner, "Status", "", "", $newSupporter, $newStatus, $oldOwnerEmail);
+	}
+	
+	/** update Ticket */
+	updateTicket($ticketTitle, $ticketBeschreibung, $ticketThema, $ticketSupporter, $ticketErstellungsdatum, $ticketEndtermin, $ticketStatus, $ticketID);
+	
+	if(isset($_POST['save-ticket-goback']))
+	{
+		header("Location: index.php");
+	}
 	
 }
 
 /** get ticket */
-$stmt = getTicketById($tid);
+$stmt = getTicketById($ticketID);
 
 /** get rowcount */
 $rowcount = $stmt->rowCount();
@@ -126,37 +191,49 @@ if($rowcount > 0)
 				        echo '</select>';
 			        echo '</div>';      	
 				echo '</div>';
-			  echo '<div class="form-group">';
-					echo '<label class="col-sm-2 control-label">Erstellungsdatum *</label>';
+			 
+				echo '<div class="form-group">';
+					echo '<label class="col-sm-2 control-label">Ersellungsdatum</label>';
 					echo '<div class="col-sm-8">';
-		                echo '<input class="form-control" id="focusedInput" placeholder="YYYY-MM-DD HH:MM:SS" name="ticket-erstellungsdatum" type="text" value="';
-		                
-		                	/** display ticket createdate */
-		                	echo $result["cTicketCreateDate"];
-		                	
-		                echo '" required>';
-		            echo '</div>';   	
+						echo '<div class="input-group date" id="datetimepicker1" >';
+							echo '<input type="text" class="form-control" placeholder="YYYY-MM-DD HH:MM:SS" name="ticket-erstellungsdatum" value="';
+								/** display ticket createdate */
+			                	echo $result["cTicketCreateDate"];
+							echo '"readonly/>';
+							echo '<span class="input-group-addon">';
+								echo '<span class="glyphicon glyphicon-calendar"></span>';
+							echo '</span>';
+						echo '</div>';
+					echo '</div>';
 				echo '</div>';
-		        echo '<div class="form-group">';
+				echo '<div class="form-group">';
 					echo '<label class="col-sm-2 control-label">Endtermin</label>';
-					echo '<div class="col-sm-8">';
-		                echo '<input class="form-control" id="focusedInput" placeholder="YYYY-MM-DD HH:MM:SS" name="ticket-endtermin" type="text" value="';
-		                
-							/**
-							 * display ticket deadline if it exists
-							 * if not, display nothing
-							 */
-							if ($result["cTicketDeadline"] == "0000-00-00 00:00:00")
-							{
-								echo "";
-							}
-							else
-							{
-								echo $result["cTicketDeadline"];
-							}
-							
-		                echo '">';
-		            echo '</div>';   	
+					echo '<div class="col-sm-7">';
+						echo '<div class="input-group date" id="datetimepicker2" >';
+							echo '<input type="text" class="form-control" placeholder="YYYY-MM-DD HH:MM:SS" name="ticket-endtermin" value="';
+								/**
+								 * display ticket deadline if it exists
+								 * if not, display nothing
+								 */
+								if ($result["cTicketDeadline"] == "0000-00-00 00:00:00")
+								{
+									echo "";
+								}
+								else
+								{
+									echo $result["cTicketDeadline"];
+								}
+							echo '"readonly/>';
+							echo '<span class="input-group-addon">';
+								echo '<span class="glyphicon glyphicon-calendar"></span>';
+							echo '</span>';
+						echo '</div>';
+					echo '</div>';
+					echo '<div class="col-sm-1">';
+						echo '<button class="btn btn-default btn-block" type="button" onClick="resetEndtermin(); return false;">';
+							echo '<span class="glyphicon glyphicon-remove"></span>';
+						echo '</button>';
+					echo '</div>';
 				echo '</div>';
 		        echo '<div class="form-group">';
 					echo '<label class="col-sm-2 control-label">Last Change</label>';
@@ -191,7 +268,7 @@ if($rowcount > 0)
 		           	echo '<div class="col-sm-8" class="form-control">';	
 		           	
 		           		/** get tickefile */
-			           	$stmt = getTickefile();
+			           	$stmt = getTicketfile($ticketID);
 			           	
 			           	/** get rowcount of listing */
 			           	$rowcount = $stmt->rowCount();
@@ -219,7 +296,7 @@ if($rowcount > 0)
 					echo '<div class="col-sm-2">';
 					echo '</div>';
 					echo '<div class="col-sm-4">';
-						echo '<button class="btn btn-primary btn-block" name="save-ticket" action="index.php" type="submit" >Speichern und Zurück</button>';
+						echo '<button class="btn btn-primary btn-block" name="save-ticket-goback" action="index.php" type="submit" >Speichern und Zurück</button>';
 					echo '</div>';
 					echo '<div class="col-sm-2">';
 						echo '<button class="btn btn-default btn-block" name="save-ticket" type="submit">Speichern</button>';
@@ -365,7 +442,7 @@ if($rowcount > 0)
 						 */
 					
 						/** get tickefile */
-			           	$stmt = getTickefile();
+			           	$stmt = getTicketfile($ticketID);
 			           	
 			           	/** get rowcount of listing */
 			           	$rowcount = $stmt->rowCount();
@@ -405,3 +482,21 @@ else
 	echo '<div class="container"><div class="alert alert-danger"><strong>Error: </strong>Es existiert kein Ticket mit dieser Referenznummer.</div></div>';
 }
 ?>
+<script type="text/javascript">
+$(function () 
+{
+	$('#datetimepicker2').datetimepicker(
+	{
+		format: 'YYYY-MM-DD HH:mm:ss',
+		locale: moment.locale('de')
+	});
+	$('#datetimepicker2').data("DateTimePicker").ignoreReadonly(true);
+
+	$('#datetimepicker3').datetimepicker(
+	{
+		format: 'YYYY-MM-DD HH:mm:ss',
+		locale: moment.locale('de')
+	});
+	$('#datetimepicker3').data("DateTimePicker").ignoreReadonly(true);
+});
+</script>   
