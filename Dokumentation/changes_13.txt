@@ -1,0 +1,40 @@
+Add commententary to sbts.css 
+Add commententary to login.css
+Add commententary to checkrole.inc.php
+Add commententary to checkauth.inc.php
+Add commententary to dbconnections.indc.php
+Add commententary to resultAsTicketliste()
+Add commententary to getEveryCategory()
+Add commententary to getEveryStatus()
+Add commententary to getEveryAdmin()
+Add commententary to getEveryUserWithoutUser0()
+Add commententary to getTicketfile()
+Add commententary to getTicketById()
+Add commententary to getOldTicketData()
+Add commententary to getNewSupporter()
+Add commententary to getSupporterEmail()
+Add commententary to updateTicket()
+Add commententary to validateUser()
+Add commententary to createNewTicket()
+Add commententary to checkFile()
+Add commententary to createTicket()
+Add commententary to saveFile()
+Add commententary to fileNameToDb()
+Add commententary to fileConnectionToDb()
+Add commententary to fileToDb()
+Add commententary to header.inc.php
+Add commententary to navigation.inc.php
+Fixed the displayed name in the navbar benutzer_details
+Fixed deaktivation of user
+Fixed rolecheck of neuernutzer.php
+Fixed grammar in errormessage for username in validation
+Fixed spelling of "Erstelldatum" in ticket_details
+Fixed displaying the tickettitle and ticket description after the errormessage if the date is invalid
+
+
+TODO: 
+Comment userlist
+Comment benutzer_details
+Comment neuernutzer
+Comment neuesticket
+Comment profil

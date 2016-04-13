@@ -1,4 +1,6 @@
 <?php 
+
+/** database connection for counting tickets */
 $query = "SELECT COUNT(*) FROM ttickets";
 $stmt = mysqli_prepare($conn, $query);
 mysqli_stmt_execute($stmt);
@@ -6,6 +8,12 @@ mysqli_stmt_bind_result($stmt, $ticketsum);
 mysqli_stmt_fetch($stmt);
 mysqli_stmt_close($stmt);
 	
+/**
+ * Select correct navbar, dependent on $navbar value
+ * 1 = administrator
+ * 2 = user
+ * 3 = login
+ */
 if ($navbar === 1)
 {
 	echo '<nav class="navbar navbar-default navbar-fixed-top">';
@@ -26,7 +34,10 @@ if ($navbar === 1)
                     echo '<li>';
                     	echo '<a href="../index.php"><span class="glyphicon glyphicon-home"></span> Ticketübersicht ';
                         	echo '<span class="badge">';
-								echo $ticketsum;									
+                        	
+                        		/** summ of tickets */
+								echo $ticketsum;
+								
                     		echo '</span>';
                        	echo '</a>';
                     echo '</li>';
@@ -43,7 +54,8 @@ if ($navbar === 1)
                         echo '<a href="manual/Benutzerhandbuch.pdf" target="_blank"><span class="glyphicon glyphicon-file"></span> Hilfe</a>';
                     echo '</li>';
                     echo '<li>';
-                    	echo '<a href="profil.php"><span class="glyphicon glyphicon-user"></span>'; 
+                    	echo '<a href="profil.php"><span class="glyphicon glyphicon-user"></span>';
+                    		/** Username */
                     		echo " {$userVorname}  {$userNachname}";  
                     	echo'</a>';
                     echo '</li>';
@@ -64,8 +76,7 @@ if ($navbar === 1)
             echo '</div>';
         echo '</div>';
     echo '</nav>';
-}
-	
+}	
 if ($navbar === 2)
 {
 	echo '<nav class="navbar navbar-default navbar-fixed-top">';
@@ -84,8 +95,11 @@ if ($navbar === 2)
 	        	echo '<ul class="nav navbar-nav">';
 					echo '<li>';
 						echo '<a href="index.php"><span class="glyphicon glyphicon-home"></span> Ticketübersicht ';
-							echo '<span class="badge">';						
+							echo '<span class="badge">';
+							
+								/** summ of tickets */
 								echo $ticketsum;	
+								
 							echo '</span>';
 						echo '</a>';
 					echo '</li>';
@@ -102,8 +116,11 @@ if ($navbar === 2)
 	            		echo '<a href="manual/Benutzerhandbuch.pdf" target="_blank"><span class="glyphicon glyphicon-file"></span>	Hilfe</a>';
 	            	echo '</l>';
 	            	echo '<li>';
-	                	echo '<a href="profil.php"><span class="glyphicon glyphicon-user"></span>'; 
+	                	echo '<a href="profil.php"><span class="glyphicon glyphicon-user"></span>';
+	                	
+	                		/** username */
 	                		echo " {$userVorname}  {$userNachname}"; 
+	                		
 	                	echo'</a>';
 	                echo '</li>';
 	                echo '<li>';
@@ -114,7 +131,6 @@ if ($navbar === 2)
 	    echo '</div>';
 	echo '</nav>';
 }
-	
 if ($navbar === 3)
 {
 	echo '<nav class="navbar navbar-default navbar-fixed-top">';

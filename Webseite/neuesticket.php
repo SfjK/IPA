@@ -22,23 +22,23 @@ include ('include/footer.inc.php');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST')
 {
-	$tickettitle = $_POST["ticket-title"];
+	$ticketTitle = $_POST["ticket-title"];
 	$ticketkategorieid = $_POST["ticket-thema"];
-	$ticketdesc = $_POST["ticket-beschreibung"];
-	$ticketdeadline = $_POST["ticket-endtermin"];
+	$ticketDesc = $_POST["ticket-beschreibung"];
+	$ticketDeadline = $_POST["ticket-endtermin"];
 
-	$tickettitle = strip_tags($tickettitle);
-	$ticketdesc = strip_tags($ticketdesc);
+	$ticketTitle = strip_tags($ticketTitle);
+	$ticketDesc = strip_tags($ticketDesc);
 
-	$currentdate = date('Y-m-d H:i:s');
-	$checkdeadline = $_POST["ticket-endtermin"];
+	$currentDate = date('Y-m-d H:i:s');
+	$checkDeadline = $_POST["ticket-endtermin"];
 
 	$dateOk = 1;
-	if(empty($checkdeadline))
+	if(empty($checkDeadline))
 	{
 		$dateOk = 1;
 	}
-	elseif ($checkdeadline < $currentdate)
+	elseif ($checkDeadline < $currentDate)
 	{
 		$dateError = "<div class='alert alert-danger'>Die Deadline kann nicht vor dem Erstellungsdatum des Tickets liegen</div>";
 		$dateOk = 0;

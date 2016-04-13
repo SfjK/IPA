@@ -1,10 +1,21 @@
 <?php
+/**
+ * include database settings
+ */
 include ('include/dbsettings.inc.php');
 
+/** get connection */
 $conn = @mysqli_connect($servername, $username, $password, $dbname);
 
+/**
+ * Error if the connection doesent work
+ * @param $conn - connection
+ */
 if (!$conn) 
 {
+	/**
+	 * errormessage
+	 */
 	echo '<nav class="navbar navbar-default navbar-fixed-top">';
 		echo '<div class="container-fluid">';
 			echo '<div class="navbar-header">';

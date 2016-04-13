@@ -31,8 +31,8 @@ if(isset($_POST['deactivate-user']))
 
 if(isset($_POST['save-user']))
 {
-	$userVorname = $_POST["vorname"];
-	$userNachname = $_POST["nachname"];
+	$tempVorname = $_POST["vorname"];
+	$tempNachname = $_POST["nachname"];
 	$userName = $_POST["username"];
 	$userEmail= $_POST["email"];
 	$userPhone = $_POST["phone"];
@@ -40,8 +40,8 @@ if(isset($_POST['save-user']))
 	$userPasswort = $_POST["passwort"];
 	$userRolle = $_POST["rolle"];
 	
-	$userVorname = strip_tags($userVorname);
-	$userNachname = strip_tags($userNachname);
+	$tempVorname = strip_tags($tempVorname);
+	$tempNachname = strip_tags($tempNachname);
 	$userName = strip_tags($userName);
 	$userEmail= strip_tags($userEmail);
 	$userPhone = strip_tags($userPhone);
@@ -49,7 +49,7 @@ if(isset($_POST['save-user']))
 	
 
 	/** validation */
-	$validationError = validateUser($conn, $userVorname, $userNachname,"", $userPhone, $userMobile, $userEmail, $detailId, $validationError);
+	$validationError = validateUser($conn, $tempVorname, $tempNachname, $userName, $userPhone, $userMobile, $userEmail, $detailId, $validationError);
 	if (!empty($validationError))
 	{
 		$validationError = '<div class="alert alert-danger">'.$validationError.'</div>';
@@ -57,14 +57,12 @@ if(isset($_POST['save-user']))
 	
 	if (empty($validationError))
 	{
-		$_SESSION["user_nachname"] = $userNachname;
-		$_SESSION["user_vorname"] = $userVorname;
-		
+	
 		if (empty($userPasswort))
 		{
 			$stmt = mysqli_stmt_init($conn);
-			mysqli_stmt_prepare($stmt, 'UPDATE tbenutzer SET cVorname=?, cNachname=?, cEmail=?, cPhone=?, cMobile=? ,cRolle=? WHERE cBenutzerID=?');
-			mysqli_stmt_bind_param($stmt, "sssssii", $userVorname, $userNachname, $userEmail, $userPhone, $userMobile,$userRolle, $detailId);
+			mysqli_stmt_prepare($stmt, 'UPDATE tbenutzer SET cVorname=?, cNachname=?,cUsername=?, cEmail=?, cPhone=?, cMobile=? ,cRolle=? WHERE cBenutzerID=?');
+			mysqli_stmt_bind_param($stmt, "ssssssii", $tempVorname, $tempNachname,$userName,$userEmail, $userPhone, $userMobile,$userRolle, $detailId);
 			mysqli_stmt_execute($stmt);
 			mysqli_stmt_close($stmt);
 		}
@@ -72,13 +70,15 @@ if(isset($_POST['save-user']))
 		{
 			$userPasswort = toSha($userPasswort);
 			$stmt = mysqli_stmt_init($conn);
-			mysqli_stmt_prepare($stmt, 'UPDATE tbenutzer SET cVorname=?, cNachname=?, cEmail=?, cPhone=?, cMobile=? ,cPasswort=?,cRolle=? WHERE cBenutzerID=?');
-			mysqli_stmt_bind_param($stmt, "ssssssii", $userVorname, $userNachname, $userEmail, $userPhone, $userMobile, $userPasswort ,$userRolle, $detailId);
+			mysqli_stmt_prepare($stmt, 'UPDATE tbenutzer SET cVorname=?, cNachname=?,cUsername=?, cEmail=?, cPhone=?, cMobile=? ,cPasswort=?,cRolle=? WHERE cBenutzerID=?');
+			mysqli_stmt_bind_param($stmt, "sssssssii", $tempVorname, $tempNachname,$userName, $userEmail, $userPhone, $userMobile, $userPasswort ,$userRolle, $detailId);
 			mysqli_stmt_execute($stmt);
 			mysqli_stmt_close($stmt);
 		}
 		if ($_SESSION["user_id"] == $detailId)
 		{
+			$userVorname = $tempVorname;
+			$userNachname = $tempNachname;
 			$_SESSION["user_username"] = $userName;
 			$_SESSION["user_nachname"] = $userNachname;
 			$_SESSION["user_vorname"] = $userVorname;
@@ -204,7 +204,7 @@ if (mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer Where cBenutzerID=? && c
 				echo '<div class="form-group">';
 					echo '<label class="col-md-2 control-label"></label>';
 					echo '<div class="col-md-2">';
-						echo '<button class="btn btn-danger btn-block" name="deactivate" type="submit" >User deaktivieren</button>';
+						echo '<button class="btn btn-danger btn-block" name="deactivate-user" type="submit" >User deaktivieren</button>';
 					echo '</div>';
 				echo '</div>';
 				echo '<div class="form-group">';

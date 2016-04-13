@@ -193,7 +193,7 @@ if($rowcount > 0)
 				echo '</div>';
 			 
 				echo '<div class="form-group">';
-					echo '<label class="col-sm-2 control-label">Ersellungsdatum</label>';
+					echo '<label class="col-sm-2 control-label">Erstellungsdatum</label>';
 					echo '<div class="col-sm-8">';
 						echo '<div class="input-group date" id="datetimepicker1" >';
 							echo '<input type="text" class="form-control" placeholder="YYYY-MM-DD HH:MM:SS" name="ticket-erstellungsdatum" value="';

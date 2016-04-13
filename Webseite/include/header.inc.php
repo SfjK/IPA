@@ -9,10 +9,11 @@
 	<link type="text/css" rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css "/>
 	<link type="text/css" rel="stylesheet" href="css/sbts.css" />
 	<script type="text/javascript">
+	
+		// Clears Datetime picker
 		function resetEndtermin()
-		{	//document.forms.0.ticket-endtermin.value= "";
+		{	
 			$('#datetimepicker2').data("DateTimePicker").clear();
-			
 		}
 		
 	</script>  
