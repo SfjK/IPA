@@ -84,6 +84,9 @@ function resultAsTicketliste(array $result)
  * @param string $fTicketOwner - Filtered Owner
  * @param string $fTicketSupporter - Filtered Status
  * @return PDOStatement
+ * 
+ * Help with the IN Statment by User Sammaye
+ * http://stackoverflow.com/questions/920353/can-i-bind-an-array-to-an-in-condition
  */
 function getTicketsfForListe($fTicketStatus, $fTicketKategorie, $fTicketOwner, $fTicketSupporter)
 {
@@ -430,7 +433,7 @@ function validateUser($conn, $userVorname, $userNachname, $userName, $userPhone,
 	}
 	
 	/**
-	 * validation if the userid is not empty
+	 * validation if the userid is empty
 	 * is used for creating new user
 	 */
 	if (empty($userid))
@@ -595,7 +598,7 @@ function createTicket($con)
 };
 
 /**
- * Saves file, wirtres error if file coudnt be uploaded 
+ * Saves file, writes error if file coudnt be uploaded 
  * 
  * @param string $target_file - full filepath
  * @param PDOConnection $con - database connection
