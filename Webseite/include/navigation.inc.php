@@ -1,7 +1,7 @@
 <?php 
 
 /** database connection for counting tickets */
-$query = "SELECT COUNT(*) FROM ttickets";
+$query = "SELECT COUNT(*) FROM ttickets WHERE cStatusID=1 OR cStatusID=2 OR cStatusID=3 OR cStatusID=6";
 $stmt = mysqli_prepare($conn, $query);
 mysqli_stmt_execute($stmt);
 mysqli_stmt_bind_result($stmt, $ticketsum);
