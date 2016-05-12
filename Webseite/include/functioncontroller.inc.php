@@ -62,7 +62,21 @@ function resultAsTicketliste(array $result)
 						{
 							$row["Deadline"] = "";
 						}
-						echo '<tr>';
+						
+						
+						if ($row["Deadline"] == "")
+						{
+							echo '<tr>';
+						}
+						elseif ($row["Deadline"] <= date('Y-m-d H:i:s') && $row["Status"] != "Geschlossen" && $row["Status"] != "Gelöscht" && $row["Status"] != "Archiv")
+						{
+							echo '<tr class="danger">';
+						}
+						else 
+						{
+							echo '<tr>';
+						}
+						
 						foreach ($row as $value)
 						{
 							echo '<td>'.$value.'</td>';
