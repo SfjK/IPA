@@ -18,6 +18,9 @@ include ('include/checkrole.inc.php');
 include ('include/navigation.inc.php');
 include ('include/footer.inc.php');
 
+/** 
+ * deaktivate user 
+ */
 if(isset($_POST['deactivate-user']))
 {
 	$stmt = mysqli_stmt_init($conn);
@@ -29,6 +32,9 @@ if(isset($_POST['deactivate-user']))
 	header('Location: usermanagement.php');
 }
 
+/** 
+ * save user 
+ */
 if(isset($_POST['save-user']))
 {
 	$tempVorname = $_POST["vorname"];
@@ -47,7 +53,6 @@ if(isset($_POST['save-user']))
 	$userPhone = strip_tags($userPhone);
 	$userMobile = strip_tags($userMobile);
 	
-
 	/** validation */
 	$validationError = validateUser($conn, $tempVorname, $tempNachname, $userName, $userPhone, $userMobile, $userEmail, $detailId, $validationError);
 	if (!empty($validationError))
@@ -57,7 +62,6 @@ if(isset($_POST['save-user']))
 	
 	if (empty($validationError))
 	{
-	
 		if (empty($userPasswort))
 		{
 			$stmt = mysqli_stmt_init($conn);
@@ -114,70 +118,89 @@ if (mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer Where cBenutzerID=? && c
 			$pRolle = $row["cRolle"];
 		}
 		
+		/** html structure */
 		echo '<div class="container">';
 			echo '<form class="form-horizontal" role="form" method="post">';
 				echo '<input type="text" style="display: none" id="fakeUsername" name="fakeUsername" value="" />';
 				echo '<input type="password" style="display: none" id="fakePassword" name="fakePassword" value="" />';
+				
+				/** profil name */
 				echo '<div class="form-group">';
-					echo '<h2 class="col-md-4 control-label">'; echo "$pVorname $pNachname's Profil"; // PROFIL NAME
+					echo '<h2 class="col-md-4 control-label">'; echo "$pVorname $pNachname's Profil";
 					echo '</h2>';
 				echo '</div>';
+				
+				/** benutzer id */
 				echo '<div class="form-group">';
 					echo '<label class="col-md-2 control-label">ID</label>';
 					echo '<div class="col-md-4">';
-						echo '<div class="control-txt">'; echo $pID; echo '</div>'; // BenutzerID
+						echo '<div class="control-txt">'; echo $pID; echo '</div>';
 					echo '</div>';
 				echo '</div>';
+				
+				/** first name */
 				echo '<div class="form-group">';
 					echo '<label class="col-md-2 control-label">Vorname</label>';
 					echo '<div class="col-md-4">';
 						echo '<input class="form-control" id="focusedInput" name="vorname" value="';
-							echo $pVorname;  // VORNAME
+							echo $pVorname;
 						echo'"type="text">';
 					echo '</div>';
 				echo '</div>';
+				
+				/** last name */
 				echo '<div class="form-group">';
 					echo '<label class="col-md-2 control-label">Nachname</label>';
 					echo '<div class="col-md-4">';
 						echo '<input class="form-control" id="focusedInput" name="nachname" value="';
-							echo $pNachname; // NACHNAME
+							echo $pNachname;
 						echo'"type="text">';
 					echo '</div>';
 				echo '</div>';
+				
+				/** username name */
 				echo '<div class="form-group">';
 					echo '<label class="col-md-2 control-label">Username *</label>';
 						echo '<div class="col-md-4">';
 						echo '<input class="form-control" id="focusedInput" name="username" value="';
-							echo $pUsername; // UESERNAME
+							echo $pUsername;
 						echo'"type="text" required>';
 					echo '</div>';
 				echo '</div>';
+				
+				/** mail */
 				echo '<div class="form-group">';
 					echo '<label class="col-md-2 control-label">E-Mail Adresse *</label>';
 					echo '<div class="col-md-4">';
 						echo '<input class="form-control" id="focusedInput" name="email" value="';
-							echo $pEmail;  // MAIL
+							echo $pEmail;
 						echo'"type="text">';
 					echo '</div>';
 				echo '</div>';
+				
+				/** phone */
 				echo '<div class="form-group">';
 					echo '<label class="col-md-2 control-label">Telephonnummer</label>';
 					echo '<div class="col-md-4">';
 						echo '<input class="form-control" id="focusedInput" name="phone" value="';
-							echo $pPhone; // PHONE
+							echo $pPhone;
 						echo'"type="text" placeholder="0041000000000">';
 					echo '</div>';
 				echo '</div>';
+				
+				/** mobile */
 				echo '<div class="form-group">';
 					echo '<label class="col-md-2 control-label">Handynummer</label>';
 					echo '<div class="col-md-4">';
 						echo '<input class="form-control" id="focusedInput" name="mobile" value="';
-							echo $pMobile; // MOBILE
+							echo $pMobile;
 						echo'"type="text" placeholder="0041000000000">';
 					echo '</div>';
 				echo '</div>';
+				
+				/** role */
 				echo '<div class="form-group">';
-					echo '<label class="col-md-2 control-label">Rolle *</label>'; // ROLLE
+					echo '<label class="col-md-2 control-label">Rolle *</label>';
 					echo '<div class="col-md-4">'; 
 						echo '<select class="form-control" name="rolle" id="rolle" required>';
 							echo '<option value="0"'; if ($pRolle==0) echo 'selected="selected"'; echo '></options>';		
@@ -186,12 +209,16 @@ if (mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer Where cBenutzerID=? && c
 						echo '</select>';
 					echo '</div>';
 				echo '</div>';
+				
+				/** new password */
 				echo '<div class="form-group">';
-					echo '<label class="col-md-2 control-label">Neues Passwort</label>'; //NEUES PW
+					echo '<label class="col-md-2 control-label">Neues Passwort</label>';
 					echo '<div class="col-md-4">';
 						echo '<input type="password" name="passwort" class="form-control" id="focusedInput" type="text">';
 					echo '</div>';
 				echo '</div>';
+				
+				/** buttons */
 				echo '<div class="form-group">';
 					echo '<label class="col-md-2 control-label"></label>';
 					echo '<div class="col-md-2">';
@@ -218,8 +245,11 @@ if (mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer Where cBenutzerID=? && c
 	}
 	else
 	{
+		/** alert */
 		echo '<div class="container"><div class="alert alert-danger"><strong>Error: </strong>Dieser User existiert nicht.</div></div>';
 	}
+	
+	/** close db connection */
 	mysqli_stmt_free_result($stmt);
 	mysqli_stmt_close($stmt);
 }

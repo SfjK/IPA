@@ -406,7 +406,6 @@ function validateUser($conn, $userVorname, $userNachname, $userName, $userPhone,
 		}
 	}
 	
-	
 	/** 
 	 * validation if the userid is not empty 
 	 * is used for userdetail and userprofile form
@@ -582,7 +581,8 @@ function checkFile($con, $datei)
 		createTicket($con);
 		saveFile($target_file, $con, $datei, $filename);
 	}
-};
+}
+
 /**
  * Creates Ticket sendes Mail to me
  * 
@@ -609,7 +609,7 @@ function createTicket($con)
 	$stmt->execute();
 	$last_ticketid = $con->lastInsertId();
 	sendMail($last_ticketid, $tickettitle, $ticketusername, "Neues Ticket", $ticketvorname, $ticketnachname, "", "", "ske@sba.ch");
-};
+}
 
 /**
  * Saves file, writes error if file coudnt be uploaded 
@@ -632,7 +632,7 @@ function saveFile($target_file, $con, $datei, $filename)
 		/** error */
 		$ticketerror = '<div class="alert alert-danger">Es gab einen Fehler beim Upload der Datei';
 	}
-};
+}
 
 /**
  * saves filename to database
@@ -650,7 +650,7 @@ function fileNameToDb($con, $target_file, $filename)
 	$stmt->bindParam(':filename', $filename, PDO::PARAM_STR);
 	$stmt->execute();
 	return $last_ticketid;
-};
+}
 
 /** 
  * connects fileid to ticketid in database
@@ -666,7 +666,7 @@ function fileConnectionToDb($con, $last_ticketid)
 	$stmt->bindParam(':fileid', $last_fileid, PDO::PARAM_STR);
 	$stmt->execute();
 	$last_fileid = $con->lastInsertId();
-};
+}
 
 /**
  * Saves fiel to database 
@@ -679,6 +679,5 @@ function fileToDb($con, $target_file, $filename)
 {
 	$lastticketid = fileNameToDb($con, $target_file, $filename);
 	fileConnectionToDb($con, $lastticketid);
-};
-
+}
 ?>
