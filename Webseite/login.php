@@ -1,22 +1,22 @@
 <?php
-/** Variables */
+/** variables */
 $title = "TSW │ Log-In";
 $header = "login";
 $navbar = 3;
 $active = 1;
 
-/** Standard Page and ID */
+/** standard page and id */
 $page = "index.php";
 $id = "";
 $loginError = "";
 
-/** Includes */
+/** includes */
 include ('include/header.inc.php');
 include ('include/functioncontroller.inc.php');
 include ('include/dbconnection.inc.php');
 include ('include/navigation.inc.php');
 
-/** Defines Standard Page when available */
+/** defines standard page when available */
 if(isset($_REQUEST["page"]))
 {
 	$page = $_REQUEST["page"];
@@ -26,17 +26,17 @@ if(isset($_REQUEST["id"]))
 	$id = $_REQUEST["id"];
 }
 
-/** Post-Back for Login */
+/** post-back for login */
 if(isset($_POST['log-in']))
 {
-	/** Starts Session */
+	/** starts session */
 	session_start();
 	
-	/** Get PW and Name for Login */
+	/** get pw and name for login */
 	$username = $_POST["username"];
 	$password = $_POST["password"];
 	
-	/** Defines Standard Page when available */
+	/** defines standard page when available */
 	$param= "";
 	if(!empty($_POST["id"]))
 	{
@@ -44,22 +44,22 @@ if(isset($_POST['log-in']))
 	}
 	$startPage= $_POST["page"].$param;
 	
-	/** Passwort to Hash */
+	/** passwort to hash */
 	$password = toSha($password);
 	
-	/** Username to Lowercase */
+	/** username to lowercase */
 	$username = strtolower($username);
 	 
-	/** Login */
+	/** login */
 	$stmt = mysqli_stmt_init($conn);
 	if (mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer WHERE cUsername=? and cPasswort=? and cAktiv=?")) 
 	{
-		/** Get Rows */
+		/** get rows */
 		mysqli_stmt_bind_param($stmt, "ssi", $username, $password, $active);
 		mysqli_stmt_execute($stmt);
 		mysqli_stmt_store_result($stmt);
 		
-			/** Redirect to defined Startpage */
+			/** redirect to defined startpage */
 			if (mysqli_stmt_num_rows($stmt) > 0)
 			{
 				mysqli_stmt_bind_param($stmt, "ssi", $username, $password, $active);
@@ -68,10 +68,10 @@ if(isset($_POST['log-in']))
 				$result = mysqli_stmt_get_result($stmt);
 				mysqli_fetch_array($result, MYSQLI_NUM);
 				
-				/** Write Session */
+				/** write session */
 				foreach ($result as $row)
 				{
-					/** Save Session Variables */
+					/** save session variables */
 					$_SESSION["user_id"] = $row["cBenutzerID"];
 					$_SESSION["user_username"] = $row["cUsername"];
 					$_SESSION["user_nachname"] = $row["cNachname"];
@@ -79,16 +79,16 @@ if(isset($_POST['log-in']))
 					$_SESSION["user_role"] = $row["cRolle"];
 				}
 				
-				/** Redirect to defined Startpage */
+				/** redirect to defined startpage */
 				header("Location: ".$startPage);
 			}
 			else
 			{
-				/** Login-Error */
+				/** login-error */
 				$loginError = '<div class="alert alert-danger"> Falscher Benutzername oder Passwort.</div>';
 			}
 			
-		/** Close Connection */
+		/** close connection */
 		mysqli_stmt_free_result($stmt);
 		mysqli_stmt_close($stmt);
 	}
@@ -96,7 +96,7 @@ if(isset($_POST['log-in']))
 
 
 ?>
-<!-- Log-In Html Structure -->
+<!-- log-in html structure -->
 <div class="container">
 	<form class="login-form" action="login.php" method="post" >
 		<h3 class="login-titel">Log-In</h3>
@@ -113,6 +113,6 @@ if(isset($_POST['log-in']))
 </div> 
     
 <?php 
-/** Includes */
+/** includes */
 include ('include/footer.inc.php');
 ?>

@@ -16,7 +16,7 @@ if($_SESSION['user_role']!= 1)
 	 */
 	echo '<div class="container">';
 		header('Refresh: 2; URL = index.php');
-		die('<h2>Keine Berechtigung für diese Seite</h2> Bitte <a href="index.php">melden</a> Sie sich an.');
+		die('<h2>Sie haben keine Berechtigung für diese Seite</h2> Bitte <a href="index.php">melden</a> Sie sich an.');
 	echo '</div>';
 }
 ?>

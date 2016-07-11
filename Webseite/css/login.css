@@ -56,6 +56,5 @@ input:required:invalid, input:focus:invalid {
   background-position: 						right;
   background-repeat: 						no-repeat;
 }
- 
 input:required:valid {
 }

@@ -1,5 +1,5 @@
 <?php
-/** Variables */
+/** variables */
 $title = "TSW │ Benutzerdetail";
 $header = "normal";
 $navbar = 1;
@@ -9,7 +9,7 @@ $active = 1;
 $notactive = 0;
 $detailId = $_GET['id'];
 
-/** Includes */
+/** includes */
 include ('include/header.inc.php');
 include ('include/functioncontroller.inc.php');
 include ('include/dbconnection.inc.php');
@@ -23,12 +23,15 @@ include ('include/footer.inc.php');
  */
 if(isset($_POST['deactivate-user']))
 {
+	/** deactivate active user by id */
 	$stmt = mysqli_stmt_init($conn);
 	mysqli_stmt_prepare($stmt, "UPDATE tbenutzer SET cAktiv=? WHERE cBenutzerID=?");
 	mysqli_stmt_bind_param($stmt, "ii", $notactive, $detailId);
 	mysqli_stmt_execute($stmt);
 	mysqli_stmt_free_result($stmt);
 	mysqli_stmt_close($stmt);
+	
+	/** redirect to usermanager */
 	header('Location: usermanagement.php');
 }
 
@@ -37,6 +40,7 @@ if(isset($_POST['deactivate-user']))
  */
 if(isset($_POST['save-user']))
 {
+	/** get postback */
 	$tempVorname = $_POST["vorname"];
 	$tempNachname = $_POST["nachname"];
 	$userName = $_POST["username"];
@@ -46,6 +50,7 @@ if(isset($_POST['save-user']))
 	$userPasswort = $_POST["passwort"];
 	$userRolle = $_POST["rolle"];
 	
+	/** strip all variables */
 	$tempVorname = strip_tags($tempVorname);
 	$tempNachname = strip_tags($tempNachname);
 	$userName = strip_tags($userName);
@@ -55,15 +60,25 @@ if(isset($_POST['save-user']))
 	
 	/** validation */
 	$validationError = validateUser($conn, $tempVorname, $tempNachname, $userName, $userPhone, $userMobile, $userEmail, $detailId, $validationError);
+	
+	/** display error if existent */
 	if (!empty($validationError))
 	{
 		$validationError = '<div class="alert alert-danger">'.$validationError.'</div>';
 	}
 	
+	/** 
+	 * save user when no error exists
+	 */
 	if (empty($validationError))
 	{
+		/** 
+		 * when password is empty, save without it 
+		 * else save with password
+		 */
 		if (empty($userPasswort))
 		{
+			/** save without password */
 			$stmt = mysqli_stmt_init($conn);
 			mysqli_stmt_prepare($stmt, 'UPDATE tbenutzer SET cVorname=?, cNachname=?,cUsername=?, cEmail=?, cPhone=?, cMobile=? ,cRolle=? WHERE cBenutzerID=?');
 			mysqli_stmt_bind_param($stmt, "ssssssii", $tempVorname, $tempNachname,$userName,$userEmail, $userPhone, $userMobile,$userRolle, $detailId);
@@ -71,7 +86,8 @@ if(isset($_POST['save-user']))
 			mysqli_stmt_close($stmt);
 		}
 		else
-		{
+		{	
+			/** save with password */
 			$userPasswort = toSha($userPasswort);
 			$stmt = mysqli_stmt_init($conn);
 			mysqli_stmt_prepare($stmt, 'UPDATE tbenutzer SET cVorname=?, cNachname=?,cUsername=?, cEmail=?, cPhone=?, cMobile=? ,cPasswort=?,cRolle=? WHERE cBenutzerID=?');
@@ -79,6 +95,11 @@ if(isset($_POST['save-user']))
 			mysqli_stmt_execute($stmt);
 			mysqli_stmt_close($stmt);
 		}
+		
+		/**
+		 * if logged-in user changes his own values via usermanager
+		 * update navigation and session
+		 */
 		if ($_SESSION["user_id"] == $detailId)
 		{
 			$userVorname = $tempVorname;
@@ -91,21 +112,36 @@ if(isset($_POST['save-user']))
 	}
 }
 
+/** open connection */
 $stmt = mysqli_stmt_init($conn);
+
+/** 
+ * get user informations by id and status
+ * if user is deactivated or does not exist
+ * display error message
+ */
 if (mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer Where cBenutzerID=? && cAktiv=?"))
 {
+	/** get userdata */
 	mysqli_stmt_bind_param($stmt, "ii", $detailId,$active);
 	mysqli_stmt_execute($stmt);
 	mysqli_stmt_store_result($stmt);
 
+	/** 
+	 * if user exists 
+	 * display their information
+	 */
 	if (mysqli_stmt_num_rows($stmt) > 0)
 	{
+		/** get userdata */
 		mysqli_stmt_bind_param($stmt,"ii", $detailId,$active);
 		mysqli_stmt_execute($stmt);
-
 		$result = mysqli_stmt_get_result($stmt);
+		
+		/** fetch data */
 		mysqli_fetch_array($result, MYSQLI_NUM);
 
+		/** bind data to variables for display */
 		foreach ($result as $row)
 		{
 			$pID = $row["cBenutzerID"];
@@ -234,6 +270,8 @@ if (mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer Where cBenutzerID=? && c
 						echo '<button class="btn btn-danger btn-block" name="deactivate-user" type="submit" >User deaktivieren</button>';
 					echo '</div>';
 				echo '</div>';
+				
+				/** validation error */
 				echo '<div class="form-group">';
 					echo '<label class="col-md-2 control-label"></label>';
 					echo '<div class="col-md-4">';
@@ -246,7 +284,7 @@ if (mysqli_stmt_prepare($stmt, "SELECT * FROM tbenutzer Where cBenutzerID=? && c
 	else
 	{
 		/** alert */
-		echo '<div class="container"><div class="alert alert-danger"><strong>Error: </strong>Dieser User existiert nicht.</div></div>';
+		echo '<div class="container"><div class="alert alert-danger"><strong>Error: </strong>Dieser User existiert nicht oder ist deaktiviert.</div></div>';
 	}
 	
 	/** close db connection */

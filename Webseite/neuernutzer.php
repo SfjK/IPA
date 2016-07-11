@@ -1,12 +1,10 @@
 <?php
-/** Variables */
+/** variables */
 $title = "TSW │ Neuer Nutzer erfassen";
 $header = "normal";
 $navbar = 1;
-
 $validationError = "";
 $error = 0;
-
 $newUserVorname = "";
 $newUserNachname = "";
 $newUserName = "";
@@ -16,7 +14,7 @@ $newUserMobile = "";
 $newUserPasswort = "";
 $newUserRolle = "";
 
-/** Includes */
+/** includes */
 include ('include/header.inc.php');
 include ('include/functioncontroller.inc.php');
 include ('include/dbconnection.inc.php');
@@ -27,6 +25,7 @@ include ('include/footer.inc.php');
 
 if(isset($_POST['neuer-nutzer']))
 {
+	/** get postback */
 	$newUserVorname = $_POST["vorname"];
 	$newUserNachname = $_POST["nachname"];
 	$newUserName = $_POST["username"];
@@ -36,6 +35,7 @@ if(isset($_POST['neuer-nutzer']))
 	$newUserPasswort = $_POST["passwort"];
 	$newUserRolle = $_POST["rolle"];
 	
+	/** stripp all variables */
 	$newUserVorname = strip_tags($newUserVorname);
 	$newUserNachname = strip_tags($newUserNachname);
 	$newUserName = strip_tags($newUserName);
@@ -52,8 +52,9 @@ if(isset($_POST['neuer-nutzer']))
 		$newUserRolle = "2";
 	}
 	
-	
+	/** validate user */
 	$validationError = validateUser($conn, $newUserVorname, $newUserNachname, $newUserName, $newUserPhone, $newUserMobile, $newUserEmail, "", $validationError);
+	
 	if (!empty($validationError))
 	{
 		$validationError = '<div class="alert alert-danger">'.$validationError.'</div>';
@@ -75,7 +76,7 @@ if(isset($_POST['neuer-nutzer']))
 <div class="container">
 	<form class="form-horizontal" role="form" method="post" autocomplete="off">
 	
-	<!-- Fake Passwortfelder, damit Firefox nicht immer die falschen abfüllt -->
+	<!-- fake password fields -->
 	<input type="text" style="display: none" id="fakeUsername" name="fakeUsername" value="" />
 	<input type="password" style="display: none" id="fakePassword" name="fakePassword" value="" />
 	
